@@ -1,0 +1,10 @@
+{
+  "MONGOD": {
+    "EXECUTABLE":"\"C:/Program Files/MongoDB/Server/3.4/bin/mongod\"",
+    "CONFIGURATION":"temp.mongod.conf"
+  },
+  "CLIENT": {
+    "HOST":"127.0.0.1",
+    "PORT": 30000
+  }
+}
