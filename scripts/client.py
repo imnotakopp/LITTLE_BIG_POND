@@ -30,7 +30,7 @@ class MongoDB:
         :param docs: documents that bill inserted
         :return: boolean status of insert
         """
-        # TODO: handle import
+        # TODO: handle import with multithreading
         pass
 
     def update(self, db, coll, **kwargs):
