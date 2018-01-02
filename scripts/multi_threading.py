@@ -36,9 +36,9 @@ def test_func(args):
     if hasattr(os, 'getppid'):
         print("parent process: ", os.getppid())
     print("process id: ", os.getpid())
-    print([arg for arg in args])
+    print([(i, v) for i, v in enumerate(args) if (i % 2) - 1 != 0])
 
 
 if __name__ == "__main__":
     tests = [x for x in range(11)]
-    thread(tests, test_func)
+    get = thread(tests, test_func)

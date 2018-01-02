@@ -4,6 +4,7 @@
 """
 
 from pymongo import MongoClient
+from scripts.multi_threading import thread
 
 import os
 import json
@@ -17,10 +18,11 @@ class MongoDB:
         self.host = config["CLIENT"]["HOST"]
         self.port = config["CLIENT"]["PORT"]
         self.client = self._connect()
+        self.database = None
+        self.collection = None
 
     def _connect(self):
-        if self.client is None:
-            return MongoClient(self.host, self.port)
+        return MongoClient(self.host, self.port)
 
     def insert(self, db, coll, docs):
         """
@@ -30,8 +32,20 @@ class MongoDB:
         :param docs: documents that bill inserted
         :return: boolean status of insert
         """
-        # TODO: handle import with multithreading
-        pass
+        self.database = db
+        self.collection = coll
+        # thread(docs, self._insert_list)
+        self._insert_list(docs=docs)
+
+    def _insert_dict(self, doc):
+        clean_docs = self.clean_doc(doc)
+        self.client = self._connect()  # need to recreate connection since this function is threaded
+        self.client[self.database][self.collection].insert(clean_docs)
+
+    def _insert_list(self, docs):
+        clean_docs = self.clean_list(docs)
+        self.client = self._connect()  # need to recreate connection since this function is threaded
+        self.client[self.database][self.collection].insert_many(clean_docs)
 
     def update(self, db, coll, **kwargs):
         """
@@ -69,3 +83,42 @@ class MongoDB:
     def create_role(self, config):
         # TODO: standardize creating role
         pass
+
+    def clean_list(self, document):
+        clean_doc = []
+        for i, value in enumerate(document):
+            if type(value) is dict:
+                clean_doc.append(self.clean_doc(value))
+            elif type(value) is list:
+                clean_doc.append(self.clean_doc(value))
+        return clean_doc
+
+    def clean_doc(self, document):
+        clean_doc = {}
+        print(document)
+        for key, value in document.items():
+            clean_key = self._clean_key(key)
+            if type(value) is dict:
+                print(clean_key, value)
+                clean_doc.update({clean_key: self.clean_doc(value)})
+            elif type(value) is list:
+                print(clean_key, value)
+                clean_doc.update({clean_key: self.clean_list(value)})
+            else:
+                print(clean_key, value)
+                clean_doc.update({clean_key: self.clean_value(value)})
+        return clean_doc
+
+    def clean_value(self, val):
+        return val
+
+    def _clean_key(self, k):
+        # TODO -> to uppercase and remove special characters
+        try:
+            return k.upper()
+        except:
+            return k
+
+
+if __name__ == "__main__":
+    pass
