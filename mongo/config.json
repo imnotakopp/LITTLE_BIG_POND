@@ -1,7 +1,7 @@
 {
   "DATABASE": {
-    "EXECUTABLE":"\"C:/Program Files/MongoDB/Server/3.4/bin/mongod\"",
-    "CONFIGURATION":"C:/Users/Alan/LITTLE_BIG_POND/mongo/mongod.conf"
+    "EXECUTABLE":"\"C:/Program Files/MongoDB/Server/3.6/bin/mongod\"",
+    "CONFIGURATION":"C:/LITTLE_BIG_POND/mongo/mongod.conf"
   },
   "CLIENT": {
     "HOST":"127.0.0.1",

@@ -1,6 +1,6 @@
 
 import requests
-from AdvancedHTMLParser import Parser
+# from AdvancedHTMLParser import Parser
 from scripts.client import MongoDB
 from bson import json_util
 

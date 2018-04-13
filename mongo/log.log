@@ -232,3 +232,61 @@
 2017-12-24T17:25:38.371-0600 I NETWORK  [thread1] connection accepted from 127.0.0.1:63307 #29 (2 connections now open)
 2017-12-24T17:25:38.371-0600 I NETWORK  [conn29] received client metadata from 127.0.0.1:63307 conn29: { driver: { name: "PyMongo", version: "3.5.1" }, os: { type: "Windows", name: "Windows 7", architecture: "AMD64", version: "6.1.7601-SP1" }, platform: "CPython 3.4.0.final.0" }
 2017-12-24T17:25:50.884-0600 I -        [conn29] end connection 127.0.0.1:63307 (2 connections now open)
+2018-04-13T11:54:04.701-0700 I CONTROL  [main] ***** SERVER RESTARTED *****
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] MongoDB starting : pid=16172 port=30000 dbpath=C:/data/db 64-bit host=TABLET-I71B3OUL
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] targetMinOS: Windows 7/Windows Server 2008 R2
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] db version v3.6.3
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] git version: 9586e557d54ef70f9ca4b43c26892cd55257e1a5
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.0.1u-fips  22 Sep 2016
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] allocator: tcmalloc
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] modules: none
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] build environment:
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten]     distmod: 2008plus-ssl
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten]     distarch: x86_64
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten]     target_arch: x86_64
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] options: { config: "C:/LITTLE_BIG_POND/mongo/mongod.conf", net: { bindIp: "127.0.0.1", port: 30000 }, setParameter: { enableLocalhostAuthBypass: "false" }, storage: { dbPath: "C:/data/db", journal: { enabled: true } }, systemLog: { destination: "file", logAppend: true, path: "C:/LITTLE_BIG_POND/mongo/log.log" } }
+2018-04-13T11:54:05.029-0700 I STORAGE  [initandlisten] exception in initAndListen: NonExistentPath: Data directory C:/data/db not found., terminating
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] now exiting
+2018-04-13T11:54:05.029-0700 I CONTROL  [initandlisten] shutting down with code:100
+2018-04-13T12:03:43.442-0700 I CONTROL  [main] ***** SERVER RESTARTED *****
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] MongoDB starting : pid=16172 port=30000 dbpath=C:/data/db 64-bit host=TABLET-I71B3OUL
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] targetMinOS: Windows 7/Windows Server 2008 R2
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] db version v3.6.3
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] git version: 9586e557d54ef70f9ca4b43c26892cd55257e1a5
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.0.1u-fips  22 Sep 2016
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] allocator: tcmalloc
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] modules: none
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] build environment:
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten]     distmod: 2008plus-ssl
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten]     distarch: x86_64
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten]     target_arch: x86_64
+2018-04-13T12:03:43.752-0700 I CONTROL  [initandlisten] options: { config: "C:/LITTLE_BIG_POND/mongo/mongod.conf", net: { bindIp: "127.0.0.1", port: 30000 }, setParameter: { enableLocalhostAuthBypass: "false" }, storage: { dbPath: "C:/data/db", journal: { enabled: true } }, systemLog: { destination: "file", logAppend: true, path: "C:/LITTLE_BIG_POND/mongo/log.log" } }
+2018-04-13T12:03:43.756-0700 I STORAGE  [initandlisten] wiredtiger_open config: create,cache_size=3514M,session_max=20000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,archive=true,path=journal,compressor=snappy),file_manager=(close_idle_time=100000),statistics_log=(wait=0),verbose=(recovery_progress),
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] 
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] 
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] 
+2018-04-13T12:03:43.857-0700 I CONTROL  [initandlisten] ** WARNING: The file system cache of this machine is configured to be greater than 40% of the total memory. This can lead to increased memory pressure and poor performance.
+2018-04-13T12:03:43.858-0700 I CONTROL  [initandlisten] See http://dochub.mongodb.org/core/wt-windows-system-file-cache
+2018-04-13T12:03:43.858-0700 I CONTROL  [initandlisten] 
+2018-04-13T12:03:43.860-0700 I STORAGE  [initandlisten] createCollection: admin.system.version with provided UUID: 4c96e7b7-30d2-4a86-b8ed-8847ab2a6c0a
+2018-04-13T12:03:43.875-0700 I COMMAND  [initandlisten] setting featureCompatibilityVersion to 3.6
+2018-04-13T12:03:43.880-0700 I STORAGE  [initandlisten] createCollection: local.startup_log with generated UUID: 088248ef-842b-4834-98a4-9468d41bc944
+2018-04-13T12:03:44.255-0700 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory 'C:/data/db/diagnostic.data'
+2018-04-13T12:03:44.339-0700 I NETWORK  [initandlisten] waiting for connections on port 30000
+2018-04-13T12:03:44.431-0700 I NETWORK  [listener] connection accepted from 127.0.0.1:54172 #1 (1 connection now open)
+2018-04-13T12:03:44.433-0700 I NETWORK  [conn1] received client metadata from 127.0.0.1:54172 conn: { driver: { name: "PyMongo", version: "3.6.1" }, os: { type: "Windows", name: "Windows 10", architecture: "AMD64", version: "10.0.15063-SP0" }, platform: "CPython 3.6.1.final.0" }
+2018-04-13T12:03:44.438-0700 I NETWORK  [listener] connection accepted from 127.0.0.1:54173 #2 (2 connections now open)
+2018-04-13T12:03:44.439-0700 I NETWORK  [conn2] received client metadata from 127.0.0.1:54173 conn: { driver: { name: "PyMongo", version: "3.6.1" }, os: { type: "Windows", name: "Windows 10", architecture: "AMD64", version: "10.0.15063-SP0" }, platform: "CPython 3.6.1.final.0" }
+2018-04-13T12:03:44.453-0700 I STORAGE  [conn2] createCollection: CROSSFIT.WODS with generated UUID: d4a92b94-a8a7-4d2c-bc27-baabe9f21498
+2018-04-13T12:03:44.961-0700 I NETWORK  [conn2] end connection 127.0.0.1:54173 (1 connection now open)
+2018-04-13T12:03:44.961-0700 I NETWORK  [conn1] end connection 127.0.0.1:54172 (0 connections now open)
+2018-04-13T12:03:48.933-0700 I NETWORK  [listener] connection accepted from 127.0.0.1:54174 #3 (1 connection now open)
+2018-04-13T12:03:48.954-0700 I NETWORK  [conn3] received client metadata from 127.0.0.1:54174 conn: { driver: { name: "mongo-java-driver", version: "018.1.0-FINAL-104-gbf88a26" }, os: { type: "Windows", name: "Windows 10", architecture: "amd64", version: "10.0" }, platform: "Java/Oracle Corporation/1.8.0_161-b12" }
+2018-04-13T12:03:49.001-0700 I NETWORK  [listener] connection accepted from 127.0.0.1:54175 #4 (2 connections now open)
+2018-04-13T12:03:49.002-0700 I NETWORK  [conn4] received client metadata from 127.0.0.1:54175 conn: { driver: { name: "mongo-java-driver", version: "018.1.0-FINAL-104-gbf88a26" }, os: { type: "Windows", name: "Windows 10", architecture: "amd64", version: "10.0" }, platform: "Java/Oracle Corporation/1.8.0_161-b12" }
+2018-04-13T12:08:44.257-0700 I STORAGE  [thread5] createCollection: config.system.sessions with generated UUID: 2b6b4afd-8453-4879-aa32-91a9ac51bafd
+2018-04-13T12:08:44.279-0700 I INDEX    [thread5] build index on: config.system.sessions properties: { v: 2, key: { lastUse: 1 }, name: "lsidTTLIndex", ns: "config.system.sessions", expireAfterSeconds: 1800 }
+2018-04-13T12:08:44.279-0700 I INDEX    [thread5] 	 building index using bulk method; build may temporarily use up to 500 megabytes of RAM
+2018-04-13T12:08:44.282-0700 I INDEX    [thread5] build index done.  scanned 0 total records. 0 secs
