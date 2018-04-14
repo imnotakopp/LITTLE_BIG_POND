@@ -1,5 +1,5 @@
 from tornado.web import RequestHandler
-from scripts.client import MongoDB
+from scripts.client import Client
 
 
 class MainAPIHandler(RequestHandler):
@@ -9,7 +9,7 @@ class MainAPIHandler(RequestHandler):
             self.set_status(401, "Unauthorized")
             self.finish()
             return
-        self.client = MongoDB()
+        self.client = Client()
         super(RequestHandler).__init__(self)
 
     def get(self):

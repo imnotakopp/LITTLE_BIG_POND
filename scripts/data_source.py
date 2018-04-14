@@ -1,7 +1,7 @@
 
 import requests
 # from AdvancedHTMLParser import Parser
-from scripts.client import MongoDB
+from scripts.client import Client
 from bson import json_util
 
 
@@ -9,7 +9,7 @@ class DataSource:
 
     def __init__(self, config_id, handler=None):
         self._id = config_id
-        self.client = MongoDB()
+        self.client = Client()
         self.handler = handler
         self.config = self._get_config()
 

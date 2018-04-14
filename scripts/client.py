@@ -2,21 +2,21 @@
 @author: Alan Kopp
 @created: 9/24/2017
 """
-
+from scripts import exceptions
 from pymongo import MongoClient
-from scripts.multi_threading import thread
+from bson import json_util, ObjectId
+import re
+import ast
+from datetime import datetime
+import time
 
-import os
-import json
 
-
-class MongoDB:
+class Client:
 
     def __init__(self):
-        f = open("{0}/config.json".format(os.getcwd())).read()
-        config = json.loads(f)
-        self.host = config["CLIENT"]["HOST"]
-        self.port = config["CLIENT"]["PORT"]
+        # todo: create setup file
+        self.host = "127.0.0.1"
+        self.port = 30000
         self.client = self._connect()
         self.database = None
         self.collection = None
@@ -29,25 +29,29 @@ class MongoDB:
 
         :param db: database to use
         :param coll: collection to insert
-        :param docs: documents that bill inserted
+        :param docs: documents to be inserted, can be type 'dict' or 'list'
         :return: boolean status of insert
         """
         self.database = db
         self.collection = coll
-        # thread(docs, self._insert_list)
-        self._insert_list(docs=docs)
+        if type(docs) is list:
+            self._insert_list(docs)
+        elif type(docs) is dict:
+            self._insert_dict(docs)
+        else:
+            raise Exception("was expecting 'list' or 'dict' type but found '{}'".format(type(docs)))
 
     def _insert_dict(self, doc):
-        clean_docs = self.clean_doc(doc)
+        clean_docs = self.clean_doc(doc, keys=True)
         self.client = self._connect()  # need to recreate connection since this function is threaded
         self.client[self.database][self.collection].insert(clean_docs)
 
     def _insert_list(self, docs):
-        clean_docs = self.clean_list(docs)
+        clean_docs = self.clean_list(docs, keys=True)
         self.client = self._connect()  # need to recreate connection since this function is threaded
         self.client[self.database][self.collection].insert_many(clean_docs)
 
-    def update(self, db, coll, **kwargs):
+    def update(self, db, coll, filter, doc, upsert=True):
         """
 
         :param db: database to use
@@ -55,70 +59,115 @@ class MongoDB:
         :param kwargs: supported arguments include find, documents,
         :return:
         """
-        # TODO: handle update
-        pass
+        self.database = db
+        self.collection = coll
+        self.client[self.database][self.collection].update(
+            filter,
+            doc,
+            upsert=upsert
+        )
 
-    def aggregate(self, pipeline, **kwargs):
+    def aggregate(self, database, collection=None, pipeline=None, file_id=None):
         """
 
-        :param db: database to use in pipeline
-        :param coll: base collection to use for aggregation
+        :param database: database to use in pipeline
+        :param collection: base collection to use for aggregation
         :param pipeline: mongo aggregate pipeline
-        :param kwargs: supported arguments include database, collection, list_coll (list of datasets that aren't stored
-        in MongoDB), cursor, disk, out_db, out_coll if not defined in pipeline, doc_modifier, predecessors->aggregation .
+        :param file_id: a reference a aggregation javascript file
         :return:
         """
-        # TODO: handle aggregate
-        # TODO: incorporate custom pipeline keywords for (this might be removed by fn_modifier
-        #   $project dates
-        #   $
-        pass
 
-    def create_user(self, config):
-        try:
-            self.client.admin.add_user(config["USER"], config["PASSWORD"], roles=config["ROLES"])
-        except Exception as e:
-            print("ERROR: {0}".format(e))
+        if file_id:
+            path = 'C:/LITTLE_BIG_POND/aggregates/{db}/{id}.js'.format(db=database, id=file_id)
+            content = None
+            try:
+                with open(path, 'r') as f:
+                    content = f.read()
+            except exceptions.FileNotFound as e:
+                raise exceptions.FileNotFound(path=path, error=e)
 
-    def create_role(self, config):
-        # TODO: standardize creating role
-        pass
+            collection, pipeline = self.parse_aggregate(content)
 
-    def clean_list(self, document):
+        if not pipeline or not collection:
+            raise exceptions.AggregateException(error="collection or pipeline not defined")
+        pipeline = json_util.loads(pipeline)
+        pipeline = self.clean_list(pipeline)
+        print(json_util.dumps(pipeline, indent=4))
+
+        # docs = list(self.client[database][collection].aggregate(pipeline))
+
+    def parse_aggregate(self, content):
+
+        re_coll = re.compile(r'db[\.\[\"\']+([\w\d\s\.]*)[\]\'\"]*.aggregate')
+        re_commments = re.compile(r'\/\/.*|\/\*[\w\d\s\n]*\*\/')
+        re_fluff = re.compile(r'\s\s|\n|\t|\r')
+        re_iso = re.compile(r'ISODate\([\'\"]?([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z)?[\'\"]?\)')
+        re_bson = re.compile(r'ObjectId\([\'\"](.*)[\'\"]\)')
+        re_commas = re.compile(r',(]|})')
+        re_pipe = re.compile(r'db[\.\[\"\']+([\w\d\s\.]*)[\]\'\"]*.aggregate\((.*)\);')
+
+        # remove single line and multi-line comments
+        pipeline = re.sub(re_commments, '', content)
+        # remove extra white spaces, tabs, new lines, etc.
+        pipeline = re.sub(re_fluff, '', pipeline)
+        # wrap ISODate() in single quotes
+        pipeline = re.sub(re_iso, r'"ISODate(\1)"', pipeline)
+        # wrap ObjectId() in single quotes
+        pipeline = re.sub(re_bson, r'"ObjectId(\1)"', pipeline)
+        # convert boolean true / false to True and False
+        pipeline = re.sub('true', '"True"', pipeline)
+        pipeline = re.sub('false', '"False"', pipeline)
+        # wrap all keys with single quotes
+        pipeline = re.sub(r'(\$?[^:\{\[\'\",]+?):\s', r'"\1": ', pipeline)
+        # remove extra commas
+        pipeline = re.sub(re_commas, r'\1', pipeline)
+        # extract stages and collection
+        parts = re.search(re_pipe, pipeline)
+        return parts.group(1), parts.group(2)
+
+    def clean_list(self, document, keys=False):
         clean_doc = []
         for i, value in enumerate(document):
             if type(value) is dict:
-                clean_doc.append(self.clean_doc(value))
+                clean_doc.append(self.clean_doc(value, keys=keys))
             elif type(value) is list:
-                clean_doc.append(self.clean_doc(value))
+                clean_doc.append(self.clean_list(value, keys=keys))
         return clean_doc
 
-    def clean_doc(self, document):
+    def clean_doc(self, document, keys=False):
         clean_doc = {}
-        print(document)
         for key, value in document.items():
-            clean_key = self._clean_key(key)
+            clean_key = self._clean_key(key) if keys else key
             if type(value) is dict:
-                print(clean_key, value)
-                clean_doc.update({clean_key: self.clean_doc(value)})
+                clean_doc.update({clean_key: self.clean_doc(value, keys=keys)})
             elif type(value) is list:
-                print(clean_key, value)
-                clean_doc.update({clean_key: self.clean_list(value)})
+                clean_doc.update({clean_key: self.clean_list(value, keys=keys)})
             else:
-                print(clean_key, value)
                 clean_doc.update({clean_key: self.clean_value(value)})
         return clean_doc
 
     def clean_value(self, val):
-        return val
+        if type(val) is not str:
+            return val
+        if 'ObjectId' in val:
+            return ObjectId(re.search(r'ObjectId\((.+?)\)', val).group(1))
+        elif 'ISODate' in val:
+            try:
+                return datetime.strptime(val, 'ISODate(%Y-%m-%dT%H:%M:%S.%fZ)')
+            except ValueError as e:
+                return datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        else:
+            return ast.literal_eval(val)
 
     def _clean_key(self, k):
-        # TODO -> to uppercase and remove special characters
-        try:
-            return k.upper()
-        except:
-            return k
+        regex = re.compile(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))')
+        return re.sub(regex, r'_\1', k).upper()
 
 
 if __name__ == "__main__":
-    pass
+
+    client = Client()
+    try:
+        client.aggregate(database='SYSTEM', file_id='aggregate')
+    except exceptions.Exceptions as e:
+        print(e.message)
