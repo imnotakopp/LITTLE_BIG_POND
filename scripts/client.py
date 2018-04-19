@@ -67,7 +67,7 @@ class Client:
             upsert=upsert
         )
 
-    def aggregate(self, database, collection=None, pipeline=None, file_id=None):
+    def aggregate(self, database, collection=None, pipeline=None, file_id=None, prepend=None):
         """
 
         :param database: database to use in pipeline
@@ -90,11 +90,21 @@ class Client:
 
         if not pipeline or not collection:
             raise exceptions.AggregateException(error="collection or pipeline not defined")
-        pipeline = json_util.loads(pipeline)
-        pipeline = self.clean_list(pipeline)
-        print(json_util.dumps(pipeline, indent=4))
+        if prepend:
+            if type(prepend) is list:
+                pipeline = prepend + pipeline
+            elif type(prepend) is dict:
+                pipeline = [prepend] + pipeline
+            else:
+                raise ValueError(message='prepend argument was given in an unsupported type')
 
-        # docs = list(self.client[database][collection].aggregate(pipeline))
+        print(pipeline)
+        pipeline = json_util.loads(pipeline)
+        # print(pipeline)
+        pipeline = self.clean_list(pipeline)
+        # print(json_util.dumps(pipeline, indent=4))
+
+        return list(self.client[database][collection].aggregate(pipeline))
 
     def parse_aggregate(self, content):
 
@@ -105,6 +115,7 @@ class Client:
         re_bson = re.compile(r'ObjectId\([\'\"](.*)[\'\"]\)')
         re_commas = re.compile(r',(]|})')
         re_pipe = re.compile(r'db[\.\[\"\']+([\w\d\s\.]*)[\]\'\"]*.aggregate\((.*)\);')
+        re_quotes = re.compile(r'\'')
 
         # remove single line and multi-line comments
         pipeline = re.sub(re_commments, '', content)
@@ -117,10 +128,13 @@ class Client:
         # convert boolean true / false to True and False
         pipeline = re.sub('true', '"True"', pipeline)
         pipeline = re.sub('false', '"False"', pipeline)
-        # wrap all keys with single quotes
-        pipeline = re.sub(r'(\$?[^:\{\[\'\",]+?):\s', r'"\1": ', pipeline)
         # remove extra commas
         pipeline = re.sub(re_commas, r'\1', pipeline)
+        # replace single quotes with double
+        pipeline = re.sub(re_quotes, r'"', pipeline)
+        # wrap all keys with single quotes
+        print(pipeline)
+        pipeline = re.sub(r'\s?(\$?[^:\{\[\'\",]+?)\s?:(?![0-9]{2}[:\.])', r'"\1": ', pipeline)
         # extract stages and collection
         parts = re.search(re_pipe, pipeline)
         return parts.group(1), parts.group(2)
@@ -132,6 +146,8 @@ class Client:
                 clean_doc.append(self.clean_doc(value, keys=keys))
             elif type(value) is list:
                 clean_doc.append(self.clean_list(value, keys=keys))
+            else:
+                clean_doc.append(self.clean_value(value))
         return clean_doc
 
     def clean_doc(self, document, keys=False):
@@ -155,9 +171,16 @@ class Client:
             try:
                 return datetime.strptime(val, 'ISODate(%Y-%m-%dT%H:%M:%S.%fZ)')
             except ValueError as e:
-                return datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                return datetime.now().replace(second=0, microsecond=0)
         else:
-            return ast.literal_eval(val)
+            try:
+                return ast.literal_eval(val)
+            except SyntaxError as e:
+                # print(val)
+                return val
+            except ValueError as e:
+                # print(val)
+                return val
 
     def _clean_key(self, k):
         regex = re.compile(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))')
